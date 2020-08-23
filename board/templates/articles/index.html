@@ -1,0 +1,55 @@
+{% extends base.html %}
+
+{% block title %}
+KWEB Board Page {{page|escape}}
+{% endblock %}
+
+{% block header %}
+<div class="page-title">KWEB Board Page {{page|escape}}</div>
+<ul>
+    <li>
+        <a href="/">Go to Home</a>
+    </li>
+    <li>
+        <a href="/article/compose">Compose New Article</a>
+    </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="title-table">
+    <div class="title-row title-header">
+        <div class="article-id">Num</div>
+        <div class="article-title">Title</div>
+        <div class="article-author">Author</div>
+        <div class="article-lastupdated">Last Updated</div>
+    </div>
+    {% for article in articles %}
+        <div class="title-row">
+            <div class="article-id">{{article.id|escape}}</div>
+            <div class="article-title">
+                <a href="{% url 'get_article' article.id %}">{{article.title|escape}}</a>
+            </div>
+            <div class="article-author">{{article.displayName|escape}}</div>
+            <div class="article-lastupdated">{{article.lastUpdated}}</div>
+        </div>
+    {% endfor %}
+</div>
+<div class="pagination">
+    {% if hasPrev %}
+        <div>
+            <a href="{% url 'article_list' page-1 %}">&lt; Previous Page</a>
+        </div>
+    {% else %}
+        <div class="disabled">&lt; Previous Page</div>
+    {% endif %}
+    
+    {% if hasNext %}
+        <div>
+            <a href="{% url 'article_list' page+1 %}">&gt; Next Page</a>
+        </div>
+    {% else %}
+        <div class="disabled">&gt; Next Page</div>
+    {% endif %}
+</div>
+{% endblock %}

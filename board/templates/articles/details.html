@@ -1,0 +1,31 @@
+{% extends base.html %}
+
+{% block title %}
+{{article.title|escape}}
+{% endblock %}
+
+{% block header %}
+<ul>
+    <li>
+        <a href="{% url 'index' %}">Go to Home</a>
+    </li>
+    <li>
+        <a href="{% url 'article_list' 1 %}">Go to Board</a>
+    </li>
+</ul>
+<div class="page-title article-title">{{article.title|escape}}</div>
+<div class="article-details">
+    article by {{article.displayName|escape}} | {{article.lastUpdated|escape}}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="article-content">{{article.content}}</div>
+{% if user and user.id == article.author %}
+<div class="update-article">
+    <a href="{% url 'edit_article' article.id %}">Edit Article</a>
+    /
+    <a href="{% url 'delete_article' article.id %}">Delete Article</a>
+</div>
+{% endif %}
+{% endblock %}

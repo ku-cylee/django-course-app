@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Index Page{% endblock %}
+
+{% block header %}
+<div class="page-title">Welcome to KWEB Community Page!</div>
+<ul>
+    {% if is_anonymous %}
+        <div>
+            <a href="{% url 'login' %}">Login</a>
+            &nbsp;/&nbsp;
+            <a href="{% url 'register' %}">Register</a>
+        </div>
+    {% else %}
+        <li>Hello, {{user.displayName|escape}}!</li>
+        <li>
+            <a href="{% url 'logout' %}">Logout</a>
+        </li>
+    {% endif %}
+</ul>
+{% endblock %}
+
+{% block content %}
+<ul>
+    <li>
+        <a href="{% url 'article_list' 1 %}">View Articles</a>
+    </li>
+    <li>
+        <a href="{% url 'compose_article' %}">Compose Articles</a>
+    </li>
+</ul>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block header %}
+<div class="page-title">Register</div>
+<ul>
+    <li>
+        <a href="{% url 'index' %}">Go to Home</a>
+    </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<form method="post">
+    <div class="panell">
+        <div class="panel-row">
+            <div class="label">Display Name</div>
+            <div class="input">
+                <input id="display-name" name="display_name" type="text">
+            </div>
+        </div>
+        <div class="panel-row">
+            <div class="label">Username</div>
+            <div class="input">
+                <input id="username" name="username" type="text">
+            </div>
+        </div>
+        <div class="panel-row">
+            <div class="label">Password</div>
+            <div class="input">
+                <input id="password" name="password" type="password">
+            </div>
+        </div>
+        <div class="panel-row center">
+            <button type="submit">Register</button>
+        </div>
+    </div>
+</form>
+<div>
+    Already a member?&nbsp;
+    <a href="{% url 'login' %}">Login</a>
+</div>
+{% endblock %}

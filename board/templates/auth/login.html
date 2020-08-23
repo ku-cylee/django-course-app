@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block header %}
+<div class="page-title">Login</div>
+<ul>
+    <li>
+        <a href="{% url 'index' %}">Go to Home</a>
+    </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<div>
+    <form method="post">
+        <div class="panell">
+            <div class="panel-row">
+                <div class="label">Username</div>
+                <div class="input">
+                    <input id="username" name="username" type="text">
+                </div>
+            </div>
+            <div class="panel-row">
+                <div class="label">Password</div>
+                <div class="input">
+                    <input id="password" name="password" type="password">
+                </div>
+            </div>
+            <div class="panel-row center">
+                <button type="submit">Login</button>
+            </div>
+          </div>
+    </form>
+    <div>
+        Not a member? &gt;&nbsp;
+        <a href="{% url 'register' %}">Register</a>
+    </div>
+</div>
+{% endblock %}
