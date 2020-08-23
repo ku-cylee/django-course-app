@@ -10,5 +10,5 @@ urlpatterns = [
     path('article/<int:article_id>/', views.get_article, name='get_article'),
     path('article/compose/', views.compose_article, name='compose_article'),
     path('article/edit/<int:article_id/', views.edit_article, name='edit_article'),
-    path('article/delete/<int:article_id>', views.delete_article, name='delete_article'),
+    path('article/delete/<int:article_id>/', views.delete_article, name='delete_article'),
 ]

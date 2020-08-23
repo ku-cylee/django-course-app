@@ -9,27 +9,27 @@ def index(request):
 
 
 def login(request):
-    if request.GET:
+    if request.method == 'GET':
         return login_form(request)
-    if request.POST:
+    if request.method == 'POST':
         return login_post(request)
-    return Http404
+    return Http404()
 
 
 def login_form(request):
     pass
 
 
-def login_post(request);
+def login_post(request):
     pass
 
 
 def register(request):
-    if request.GET:
-        return login_form(request)
-    if request.POST:
-        return login_post(request)
-    return Http404
+    if request.method == 'GET':
+        return register_form(request)
+    if request.method == 'POST':
+        return register_post(request)
+    return Http404()
 
 
 def register_form(request):
@@ -53,11 +53,11 @@ def get_article(request, article_id):
 
 
 def compose_article(request):
-    if request.GET:
-        return login_form(request)
-    if request.POST:
-        return login_post(request)
-    return Http404
+    if request.method == 'GET':
+        return compose_article_form(request)
+    if request.method == 'POST':
+        return compose_article_post(request)
+    return Http404()
 
 
 def compose_article_form(request):
@@ -69,11 +69,11 @@ def compose_article_post(request):
 
 
 def edit_article(request, article_id):
-    if request.GET:
-        return login_form(request)
-    if request.POST:
-        return login_post(request)
-    return Http404
+    if request.method == 'GET':
+        return edit_article_form(request)
+    if request.method == 'POST':
+        return edit_article_post(request)
+    return Http404()
 
 
 def edit_article_form(request, article_id):
