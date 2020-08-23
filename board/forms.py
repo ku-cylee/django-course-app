@@ -11,6 +11,7 @@ class RegisterForm(forms.Form):
     first_name = forms.CharField()
     last_name = forms.CharField()
 
+
 class ArticleForm(forms.Form):
     title = forms.CharField(max_length=40, widget=forms.TextInput({
         'class': 'compose-title',
