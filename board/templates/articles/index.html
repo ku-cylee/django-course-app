@@ -1,17 +1,17 @@
-{% extends base.html %}
+{% extends 'base.html' %}
 
 {% block title %}
-KWEB Board Page {{page|escape}}
+KWEB Board Page {{ page|escape }}
 {% endblock %}
 
 {% block header %}
-<div class="page-title">KWEB Board Page {{page|escape}}</div>
+<div class="page-title">KWEB Board Page {{ page|escape }}</div>
 <ul>
     <li>
-        <a href="/">Go to Home</a>
+        <a href="{% url 'index' %}">Go to Home</a>
     </li>
     <li>
-        <a href="/article/compose">Compose New Article</a>
+        <a href="{% url 'compose_article' %}">Compose New Article</a>
     </li>
 </ul>
 {% endblock %}
@@ -26,27 +26,27 @@ KWEB Board Page {{page|escape}}
     </div>
     {% for article in articles %}
         <div class="title-row">
-            <div class="article-id">{{article.id|escape}}</div>
+            <div class="article-id">{{ article.id|escape }}</div>
             <div class="article-title">
-                <a href="{% url 'get_article' article.id %}">{{article.title|escape}}</a>
+                <a href="{% url 'get_article' article.id %}">{{ article.title|escape }}</a>
             </div>
-            <div class="article-author">{{article.displayName|escape}}</div>
-            <div class="article-lastupdated">{{article.lastUpdated}}</div>
+            <div class="article-author">{{ article.author.username|escape }}</div>
+            <div class="article-lastupdated">{{ article.last_updated_at }}</div>
         </div>
     {% endfor %}
 </div>
 <div class="pagination">
-    {% if hasPrev %}
+    {% if has_prev %}
         <div>
-            <a href="{% url 'article_list' page-1 %}">&lt; Previous Page</a>
+            <a href="{% url 'article_list' page|add:'-1' %}">&lt; Previous Page</a>
         </div>
     {% else %}
         <div class="disabled">&lt; Previous Page</div>
     {% endif %}
     
-    {% if hasNext %}
+    {% if has_next %}
         <div>
-            <a href="{% url 'article_list' page+1 %}">&gt; Next Page</a>
+            <a href="{% url 'article_list' page|add:1 %}">&gt; Next Page</a>
         </div>
     {% else %}
         <div class="disabled">&gt; Next Page</div>

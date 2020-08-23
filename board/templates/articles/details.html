@@ -1,7 +1,7 @@
-{% extends base.html %}
+{% extends 'base.html' %}
 
 {% block title %}
-{{article.title|escape}}
+{{ article.title|escape }}
 {% endblock %}
 
 {% block header %}
@@ -13,15 +13,16 @@
         <a href="{% url 'article_list' 1 %}">Go to Board</a>
     </li>
 </ul>
-<div class="page-title article-title">{{article.title|escape}}</div>
+<div class="page-title article-title">{{ article.title|escape }}</div>
 <div class="article-details">
-    article by {{article.displayName|escape}} | {{article.lastUpdated|escape}}
+    article by {{ article.author.username|escape }} | {{ article.last_updated_at }}
 </div>
 {% endblock %}
 
 {% block content %}
-<div class="article-content">{{article.content}}</div>
-{% if user and user.id == article.author %}
+<div class="article-content">{{ article.content|safe }}</div>
+
+{% if user and user == article.author %}
 <div class="update-article">
     <a href="{% url 'edit_article' article.id %}">Edit Article</a>
     /

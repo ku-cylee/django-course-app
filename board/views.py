@@ -1,4 +1,6 @@
-from django.shortcuts import render, redirect
+import math
+
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
@@ -74,15 +76,39 @@ def user_logout(request):
     return redirect('index')
 
 
-def articles(request, page_num):
-    pass
+def get_article_list(request, page_num):
+    COUNT = 20
+
+    article_list = Article.objects.all().filter(is_deleted=False).order_by('-id')
+    start_index = (page_num - 1) * COUNT
+    end_index = page_num * COUNT
+
+    page_count = math.ceil(len(article_list) / COUNT)
+
+    return render(request, 'articles/index.html', {
+        'page': page_num,
+        'articles': article_list[start_index:end_index],
+        'has_prev': page_num > 1,
+        'has_next': page_num < page_count,
+    })
 
 
 def get_article(request, article_id):
-    pass
+    article = get_object_or_404(Article, id=article_id)
+    if article.is_deleted:
+        return HttpResponseNotFound()
+        
+    user = request.user if request.user.is_authenticated else None
+    
+    return render(request, 'articles/details.html', {
+        'user': user,
+        'article': article,
+    })
 
 
 def compose_article(request):
+    if not request.user.is_authenticated:
+        return HttpResponseNotFound()
     if request.method == 'GET':
         return compose_article_form(request)
     if request.method == 'POST':
@@ -91,28 +117,70 @@ def compose_article(request):
 
 
 def compose_article_form(request):
-    pass
+    return render(request, 'articles/compose.html', {
+        'form': ArticleForm(),
+    })
 
 
 def compose_article_post(request):
-    pass
+    form = ArticleForm(request.POST)
+    if not form.is_valid():
+        return HttpResponseBadRequest()
+
+    new_article = Article.objects.create(
+        title=form.cleaned_data['title'],
+        content=form.cleaned_data['content'],
+        author=request.user,
+    )
+    new_article.save()
+
+    return redirect('get_article', article_id=new_article.id)
 
 
 def edit_article(request, article_id):
+    if not request.user.is_authenticated:
+        return HttpResponseNotFound()
+    
+    article = get_object_or_404(Article, id=article_id)
+    if request.user != article.author or article.is_deleted:
+        return HttpResponseNotFound()
+
     if request.method == 'GET':
-        return edit_article_form(request)
+        return edit_article_form(request, article)
     if request.method == 'POST':
-        return edit_article_post(request)
+        return edit_article_post(request, article)
     return HttpResponseNotFound()
 
 
-def edit_article_form(request, article_id):
-    pass
+def edit_article_form(request, article):
+    return render(request, 'articles/compose.html', {
+        'form': ArticleForm(initial={
+            'title': article.title,
+            'content': article.content,
+        }),
+    })
 
 
-def edit_article_post(request, article_id):
-    pass
+def edit_article_post(request, article):
+    form = ArticleForm(request.POST)
+    if not form.is_valid():
+        return HttpResponseBadRequest()
+    
+    article.title = form.cleaned_data['title']
+    article.content = form.cleaned_data['content']
+    article.save()
+    return redirect('get_article', article.id)
 
 
 def delete_article(request, article_id):
-    pass
+    if not request.user.is_authenticated:
+        return HttpResponseNotFound()
+    
+    article = get_object_or_404(Article, id=article_id)
+    if request.user != article.author or article.is_deleted:
+        return HttpResponseNotFound()
+
+    article.is_deleted = True
+    article.save()
+    
+    return redirect('article_list', page_num=1)
