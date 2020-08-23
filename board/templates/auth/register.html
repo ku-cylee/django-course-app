@@ -15,21 +15,27 @@
 <form method="post">
     <div class="panell">
         <div class="panel-row">
-            <div class="label">Display Name</div>
-            <div class="input">
-                <input id="display-name" name="display_name" type="text">
-            </div>
-        </div>
-        <div class="panel-row">
             <div class="label">Username</div>
             <div class="input">
-                <input id="username" name="username" type="text">
+                {{ form.username }}
             </div>
         </div>
         <div class="panel-row">
             <div class="label">Password</div>
             <div class="input">
-                <input id="password" name="password" type="password">
+                {{ form.password }}
+            </div>
+        </div>
+        <div class="panel-row">
+            <div class="label">First Name</div>
+            <div class="input">
+                {{ form.first_name }}
+            </div>
+        </div>
+        <div class="panel-row">
+            <div class="label">Last Name</div>
+            <div class="input">
+                {{ form.last_name }}
             </div>
         </div>
         <div class="panel-row center">

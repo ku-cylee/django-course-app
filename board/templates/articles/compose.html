@@ -14,6 +14,7 @@
     src="https://cdn.ckeditor.com/ckeditor5/21.0.0/classic/ckeditor.js" 
     defer>
 </script>
+{% load static %}
 <script type="text/javascript" src="{% static 'init-editor.js' %}" defer></script>
 {% endblock %}
 
@@ -31,15 +32,8 @@
 {% block content %}
 <div class="page-content">
     <form method="POST" enctype="application/x-www-form-urlencoded">
-        <input 
-            type="text" 
-            name="title" 
-            placeholder="Your Title Here"
-            {% __pypugjs_attrs terse=True, attrs=[('value',(article))] %} ? `$article.title` :="{}" 
-            class="compose-title">
-        <textarea id="editor" name="content">
-            {% if article %}article.content{% endif %}
-        </textarea>
+        {{ form.title }}
+        {{ form.content }}
         <button type="submit">Submit Article</button>
     </form>
 </div>
