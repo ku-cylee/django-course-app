@@ -1,27 +1,44 @@
-from django.http import Http404
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.models import User
+from django.http import HttpResponseBadRequest, HttpResponseNotFound
 
 from .models import *
+from .forms import *
 
 
 def index(request):
-    pass
+    user = request.user if request.user.is_authenticated else None
+    return render(request, 'index.html', {
+        'user': user,
+    })
 
 
-def login(request):
+def user_login(request):
     if request.method == 'GET':
         return login_form(request)
     if request.method == 'POST':
         return login_post(request)
-    return Http404()
+    return HttpResponseNotFound()
 
 
 def login_form(request):
-    pass
+    return render(request, 'auth/login.html', {
+        'form': LoginForm(),
+    })
 
 
 def login_post(request):
-    pass
+    form = LoginForm(request.POST)
+    if not form.is_valid():
+        return HttpResponseBadRequest()
+    
+    user = authenticate(
+        username=form.cleaned_data['username'],
+        password=form.cleaned_data['password'],
+    )
+    login(request, user)
+    return redirect('index')
 
 
 def register(request):
@@ -29,19 +46,32 @@ def register(request):
         return register_form(request)
     if request.method == 'POST':
         return register_post(request)
-    return Http404()
+    return HttpResponseNotFound()
 
 
 def register_form(request):
-    pass
+    return render(request, 'auth/register.html', {
+        'form': RegisterForm(),
+    })
 
 
 def register_post(request):
-    pass
+    form = RegisterForm(request.POST)
+    if not form.is_valid():
+        return HttpResponseBadRequest()
+
+    User.objects.create_user(
+        username=form.cleaned_data['username'],
+        password=form.cleaned_data['password'],
+        first_name=form.cleaned_data['first_name'],
+        last_name=form.cleaned_data['last_name'],
+    )
+    return redirect('login')
 
 
-def logout(request):
-    pass
+def user_logout(request):
+    logout(request)
+    return redirect('index')
 
 
 def articles(request, page_num):
@@ -57,7 +87,7 @@ def compose_article(request):
         return compose_article_form(request)
     if request.method == 'POST':
         return compose_article_post(request)
-    return Http404()
+    return HttpResponseNotFound()
 
 
 def compose_article_form(request):
@@ -73,7 +103,7 @@ def edit_article(request, article_id):
         return edit_article_form(request)
     if request.method == 'POST':
         return edit_article_post(request)
-    return Http404()
+    return HttpResponseNotFound()
 
 
 def edit_article_form(request, article_id):
