@@ -2,15 +2,18 @@ from django import forms
 
 
 class LoginForm(forms.Form):
-    username = forms.CharField()
-    password = forms.CharField(widget=forms.PasswordInput())
+    username = forms.CharField(max_length=15)
+    password = forms.CharField(
+        max_length=20, 
+        widget=forms.PasswordInput()
+    )
 
 
 class RegisterForm(forms.Form):
-    username = forms.CharField()
-    password = forms.CharField(widget=forms.PasswordInput())
-    first_name = forms.CharField()
-    last_name = forms.CharField()
+    username = forms.CharField(max_length=15)
+    password = forms.CharField(max_length=20, widget=forms.PasswordInput())
+    first_name = forms.CharField(max_length=30)
+    last_name = forms.CharField(max_length=30)
 
 
 class ArticleForm(forms.Form):

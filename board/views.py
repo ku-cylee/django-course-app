@@ -3,7 +3,7 @@ import math
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
-from django.http import HttpResponseBadRequest, HttpResponseNotFound
+from django.http import HttpResponse
 
 from .models import *
 from .forms import *
@@ -14,11 +14,13 @@ def index(req):
 
 
 def user_login(req):
+    if req.user.is_authenticated:
+        return HttpResponse(status=404)
     if req.method == 'GET':
         return login_form(req)
     if req.method == 'POST':
         return login_post(req)
-    return HttpResponseNotFound()
+    return HttpResponse(status=404)
 
 
 def login_form(req):
@@ -30,22 +32,28 @@ def login_form(req):
 def login_post(req):
     form = LoginForm(req.POST)
     if not form.is_valid():
-        return HttpResponseBadRequest()
+        return HttpResponse(status=400)
     
     user = authenticate(
         username=form.cleaned_data['username'],
         password=form.cleaned_data['password'],
     )
-    login(req, user)
-    return redirect('index')
+
+    if user:
+        login(req, user)
+        return redirect('index')
+    else:
+        return HttpResponse(status=401)
 
 
 def register(req):
+    if req.user.is_authenticated:
+        return HttpResponse(status=404)
     if req.method == 'GET':
         return register_form(req)
     if req.method == 'POST':
         return register_post(req)
-    return HttpResponseNotFound()
+    return HttpResponse(status=404)
 
 
 def register_form(req):
@@ -57,14 +65,15 @@ def register_form(req):
 def register_post(req):
     form = RegisterForm(req.POST)
     if not form.is_valid():
-        return HttpResponseBadRequest()
+        return HttpResponse(status=400)
 
-    User.objects.create_user(
+    user = User.objects.create_user(
         username=form.cleaned_data['username'],
         password=form.cleaned_data['password'],
         first_name=form.cleaned_data['first_name'],
         last_name=form.cleaned_data['last_name'],
     )
+    user.save()
     return redirect('login')
 
 
@@ -91,9 +100,7 @@ def get_article_list(req, page_num):
 
 
 def get_article(req, article_id):
-    article = get_object_or_404(Article, id=article_id)
-    if article.is_deleted:
-        return HttpResponseNotFound()
+    article = get_object_or_404(Article, id=article_id, is_deleted=False)
         
     return render(req, 'articles/details.html', {
         'article': article,
@@ -102,12 +109,12 @@ def get_article(req, article_id):
 
 def compose_article(req):
     if not req.user.is_authenticated:
-        return HttpResponseNotFound()
+        return HttpResponse(status=404)
     if req.method == 'GET':
         return compose_article_form(req)
     if req.method == 'POST':
         return compose_article_post(req)
-    return HttpResponseNotFound()
+    return HttpResponse(status=404)
 
 
 def compose_article_form(req):
@@ -119,7 +126,7 @@ def compose_article_form(req):
 def compose_article_post(req):
     form = ArticleForm(req.POST)
     if not form.is_valid():
-        return HttpResponseBadRequest()
+        return HttpResponse(status=400)
 
     new_article = Article.objects.create(
         title=form.cleaned_data['title'],
@@ -133,17 +140,16 @@ def compose_article_post(req):
 
 def edit_article(req, article_id):
     if not req.user.is_authenticated:
-        return HttpResponseNotFound()
+        return HttpResponse(status=404)
     
-    article = get_object_or_404(Article, id=article_id)
-    if req.user != article.author or article.is_deleted:
-        return HttpResponseNotFound()
+    article = get_object_or_404(Article, 
+                    id=article_id, is_deleted=False, author=req.user)
 
     if req.method == 'GET':
         return edit_article_form(req, article)
     if req.method == 'POST':
         return edit_article_post(req, article)
-    return HttpResponseNotFound()
+    return HttpResponse(status=404)
 
 
 def edit_article_form(req, article):
@@ -158,7 +164,7 @@ def edit_article_form(req, article):
 def edit_article_post(req, article):
     form = ArticleForm(req.POST)
     if not form.is_valid():
-        return HttpResponseBadRequest()
+        return HttpResponse(status=400)
     
     article.title = form.cleaned_data['title']
     article.content = form.cleaned_data['content']
@@ -168,11 +174,10 @@ def edit_article_post(req, article):
 
 def delete_article(req, article_id):
     if not req.user.is_authenticated:
-        return HttpResponseNotFound()
+        return HttpResponse(status=404)
     
-    article = get_object_or_404(Article, id=article_id)
-    if req.user != article.author or article.is_deleted:
-        return HttpResponseNotFound()
+    article = get_object_or_404(Article, 
+                    id=article_id, is_deleted=False, author=req.user)
 
     article.is_deleted = True
     article.save()
