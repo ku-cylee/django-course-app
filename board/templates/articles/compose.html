@@ -1,3 +1,6 @@
+<!-- Parameters -->
+<!-- user, form -->
+
 {% extends 'base.html' %}
 
 {% block title %}
@@ -26,7 +29,7 @@
         Compose New Article
     {% endif %}
 </div>
-<div>Writing as {{user.username|escape}}</div>
+<div>Writing as {{ user.username|escape }}</div>
 {% endblock %}
 
 {% block content %}

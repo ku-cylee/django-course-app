@@ -10,10 +10,7 @@ from .forms import *
 
 
 def index(req):
-    user = req.user if req.user.is_authenticated else None
-    return render(req, 'index.html', {
-        'user': user,
-    })
+    return render(req, 'index.html')
 
 
 def user_login(req):
@@ -98,10 +95,7 @@ def get_article(req, article_id):
     if article.is_deleted:
         return HttpResponseNotFound()
         
-    user = req.user if req.user.is_authenticated else None
-    
     return render(req, 'articles/details.html', {
-        'user': user,
         'article': article,
     })
 

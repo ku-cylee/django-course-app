@@ -1,3 +1,6 @@
+<!-- Parameters -->
+<!-- user -->
+
 {% extends 'base.html' %}
 
 {% block title %}Index Page{% endblock %}
@@ -5,8 +8,8 @@
 {% block header %}
 <div class="page-title">Welcome to KWEB Community Page!</div>
 <ul>
-    {% if user %}
-        <li>Hello, {{user.username|escape}}!</li>
+    {% if user.is_authenticated %}
+        <li>Hello, {{ user.username|escape }}!</li>
         <li>
             <a href="{% url 'logout' %}">Logout</a>
         </li>

@@ -1,3 +1,6 @@
+<!-- Parameters -->
+<!-- user, article -->
+
 {% extends 'base.html' %}
 
 {% block title %}
@@ -22,7 +25,7 @@
 {% block content %}
 <div class="article-content">{{ article.content|safe }}</div>
 
-{% if user and user == article.author %}
+{% if user.is_authenticated and user == article.author %}
 <div class="update-article">
     <a href="{% url 'edit_article' article.id %}">Edit Article</a>
     /
