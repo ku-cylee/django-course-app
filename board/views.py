@@ -9,29 +9,29 @@ from .models import *
 from .forms import *
 
 
-def index(request):
-    user = request.user if request.user.is_authenticated else None
-    return render(request, 'index.html', {
+def index(req):
+    user = req.user if req.user.is_authenticated else None
+    return render(req, 'index.html', {
         'user': user,
     })
 
 
-def user_login(request):
-    if request.method == 'GET':
-        return login_form(request)
-    if request.method == 'POST':
-        return login_post(request)
+def user_login(req):
+    if req.method == 'GET':
+        return login_form(req)
+    if req.method == 'POST':
+        return login_post(req)
     return HttpResponseNotFound()
 
 
-def login_form(request):
-    return render(request, 'auth/login.html', {
+def login_form(req):
+    return render(req, 'auth/login.html', {
         'form': LoginForm(),
     })
 
 
-def login_post(request):
-    form = LoginForm(request.POST)
+def login_post(req):
+    form = LoginForm(req.POST)
     if not form.is_valid():
         return HttpResponseBadRequest()
     
@@ -39,26 +39,26 @@ def login_post(request):
         username=form.cleaned_data['username'],
         password=form.cleaned_data['password'],
     )
-    login(request, user)
+    login(req, user)
     return redirect('index')
 
 
-def register(request):
-    if request.method == 'GET':
-        return register_form(request)
-    if request.method == 'POST':
-        return register_post(request)
+def register(req):
+    if req.method == 'GET':
+        return register_form(req)
+    if req.method == 'POST':
+        return register_post(req)
     return HttpResponseNotFound()
 
 
-def register_form(request):
-    return render(request, 'auth/register.html', {
+def register_form(req):
+    return render(req, 'auth/register.html', {
         'form': RegisterForm(),
     })
 
 
-def register_post(request):
-    form = RegisterForm(request.POST)
+def register_post(req):
+    form = RegisterForm(req.POST)
     if not form.is_valid():
         return HttpResponseBadRequest()
 
@@ -71,12 +71,12 @@ def register_post(request):
     return redirect('login')
 
 
-def user_logout(request):
-    logout(request)
+def user_logout(req):
+    logout(req)
     return redirect('index')
 
 
-def get_article_list(request, page_num):
+def get_article_list(req, page_num):
     COUNT = 20
 
     article_list = Article.objects.all().filter(is_deleted=False).order_by('-id')
@@ -85,7 +85,7 @@ def get_article_list(request, page_num):
 
     page_count = math.ceil(len(article_list) / COUNT)
 
-    return render(request, 'articles/index.html', {
+    return render(req, 'articles/index.html', {
         'page': page_num,
         'articles': article_list[start_index:end_index],
         'has_prev': page_num > 1,
@@ -93,67 +93,67 @@ def get_article_list(request, page_num):
     })
 
 
-def get_article(request, article_id):
+def get_article(req, article_id):
     article = get_object_or_404(Article, id=article_id)
     if article.is_deleted:
         return HttpResponseNotFound()
         
-    user = request.user if request.user.is_authenticated else None
+    user = req.user if req.user.is_authenticated else None
     
-    return render(request, 'articles/details.html', {
+    return render(req, 'articles/details.html', {
         'user': user,
         'article': article,
     })
 
 
-def compose_article(request):
-    if not request.user.is_authenticated:
+def compose_article(req):
+    if not req.user.is_authenticated:
         return HttpResponseNotFound()
-    if request.method == 'GET':
-        return compose_article_form(request)
-    if request.method == 'POST':
-        return compose_article_post(request)
+    if req.method == 'GET':
+        return compose_article_form(req)
+    if req.method == 'POST':
+        return compose_article_post(req)
     return HttpResponseNotFound()
 
 
-def compose_article_form(request):
-    return render(request, 'articles/compose.html', {
+def compose_article_form(req):
+    return render(req, 'articles/compose.html', {
         'form': ArticleForm(),
     })
 
 
-def compose_article_post(request):
-    form = ArticleForm(request.POST)
+def compose_article_post(req):
+    form = ArticleForm(req.POST)
     if not form.is_valid():
         return HttpResponseBadRequest()
 
     new_article = Article.objects.create(
         title=form.cleaned_data['title'],
         content=form.cleaned_data['content'],
-        author=request.user,
+        author=req.user,
     )
     new_article.save()
 
     return redirect('get_article', article_id=new_article.id)
 
 
-def edit_article(request, article_id):
-    if not request.user.is_authenticated:
+def edit_article(req, article_id):
+    if not req.user.is_authenticated:
         return HttpResponseNotFound()
     
     article = get_object_or_404(Article, id=article_id)
-    if request.user != article.author or article.is_deleted:
+    if req.user != article.author or article.is_deleted:
         return HttpResponseNotFound()
 
-    if request.method == 'GET':
-        return edit_article_form(request, article)
-    if request.method == 'POST':
-        return edit_article_post(request, article)
+    if req.method == 'GET':
+        return edit_article_form(req, article)
+    if req.method == 'POST':
+        return edit_article_post(req, article)
     return HttpResponseNotFound()
 
 
-def edit_article_form(request, article):
-    return render(request, 'articles/compose.html', {
+def edit_article_form(req, article):
+    return render(req, 'articles/compose.html', {
         'form': ArticleForm(initial={
             'title': article.title,
             'content': article.content,
@@ -161,8 +161,8 @@ def edit_article_form(request, article):
     })
 
 
-def edit_article_post(request, article):
-    form = ArticleForm(request.POST)
+def edit_article_post(req, article):
+    form = ArticleForm(req.POST)
     if not form.is_valid():
         return HttpResponseBadRequest()
     
@@ -172,12 +172,12 @@ def edit_article_post(request, article):
     return redirect('get_article', article.id)
 
 
-def delete_article(request, article_id):
-    if not request.user.is_authenticated:
+def delete_article(req, article_id):
+    if not req.user.is_authenticated:
         return HttpResponseNotFound()
     
     article = get_object_or_404(Article, id=article_id)
-    if request.user != article.author or article.is_deleted:
+    if req.user != article.author or article.is_deleted:
         return HttpResponseNotFound()
 
     article.is_deleted = True
